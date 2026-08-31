@@ -1,0 +1,28 @@
+---
+import ArchiveBrowser from '../../../components/ArchiveBrowser.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { notesRepository } from '../../../lib/notes';
+
+export async function getStaticPaths() {
+	const archive = await notesRepository.getArchive();
+	return archive.map(({ year }) => ({ params: { year: String(year) } }));
+}
+
+const activeYear = Number(Astro.params.year);
+const archive = await notesRepository.getArchive();
+const notes = await notesRepository.listNotesByYear(activeYear);
+---
+
+<BaseLayout
+	title={`Notes ${activeYear} — Stephan Kim`}
+	description={`${activeYear}년에 남긴 글 모음.`}
+>
+	<section class="archive" aria-labelledby="notes-title">
+		<header class="archive-header">
+			<p class="eyebrow">Archive</p>
+			<h1 id="notes-title">Notes</h1>
+			<p class="archive-intro">{activeYear}년에 남긴 글 {notes.length}편.</p>
+		</header>
+		<ArchiveBrowser {archive} {activeYear} {notes} />
+	</section>
+</BaseLayout>

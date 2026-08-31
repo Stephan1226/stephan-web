@@ -1,0 +1,64 @@
+---
+import type { ArchiveYear, NoteSummary } from '../lib/notes';
+import NoteList from './NoteList.astro';
+
+interface Props {
+	archive: ArchiveYear[];
+	activeYear: number;
+	activeMonth?: number;
+	notes: NoteSummary[];
+}
+
+const { archive, activeYear, activeMonth, notes } = Astro.props;
+const months = archive.find(({ year }) => year === activeYear)?.months ?? [];
+const COLLAPSED_AFTER = 8;
+---
+
+<div class="archive-browser">
+	<nav class="archive-years" aria-label="연도별 아카이브">
+		<ul>
+			{archive.map(({ year }) => (
+				<li>
+					<a
+						href={`/notes/${year}/`}
+						class:list={['archive-chip', 'archive-year-chip', { 'is-active': year === activeYear }]}
+						aria-current={year === activeYear ? 'page' : undefined}
+					>
+						{year}
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+	<nav class="archive-months" aria-label={`${activeYear}년 월별 아카이브`}>
+		<ul>
+			<li>
+				<a
+					href={`/notes/${activeYear}/`}
+					class:list={['archive-chip', { 'is-active': activeMonth === undefined }]}
+					aria-current={activeMonth === undefined ? 'page' : undefined}
+				>
+					전체
+				</a>
+			</li>
+			{months.map(({ month }) => (
+				<li>
+					<a
+						href={`/notes/${activeYear}/${month}/`}
+						class:list={['archive-chip', { 'is-active': month === activeMonth }]}
+						aria-current={month === activeMonth ? 'page' : undefined}
+					>
+						{month}월
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+	<div class="archive-notes">
+		{notes.length > 0 ? (
+			<NoteList {notes} collapsedAfter={COLLAPSED_AFTER} />
+		) : (
+			<p class="archive-empty">이 기간에 남긴 글이 없습니다.</p>
+		)}
+	</div>
+</div>

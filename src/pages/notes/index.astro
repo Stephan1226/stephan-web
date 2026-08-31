@@ -1,0 +1,24 @@
+---
+import ArchiveBrowser from '../../components/ArchiveBrowser.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { notesRepository } from '../../lib/notes';
+
+const archive = await notesRepository.getArchive();
+const activeYear = archive[0]?.year;
+const notes = activeYear ? await notesRepository.listNotesByYear(activeYear) : [];
+---
+
+<BaseLayout title="Notes — Stephan Kim" description="A chronological archive of short notes, ideas and observations.">
+	<section class="archive" aria-labelledby="notes-title">
+		<header class="archive-header">
+			<p class="eyebrow">Archive</p>
+			<h1 id="notes-title">Notes</h1>
+			<p class="archive-intro">짧게 남긴 생각과 관찰을 연도와 월로 모아둡니다.</p>
+		</header>
+		{activeYear ? (
+			<ArchiveBrowser {archive} {activeYear} {notes} />
+		) : (
+			<p class="archive-empty">아직 남긴 글이 없습니다.</p>
+		)}
+	</section>
+</BaseLayout>

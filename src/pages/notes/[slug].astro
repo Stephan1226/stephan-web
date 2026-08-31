@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../lib/date';
+import { notesRepository } from '../../lib/notes';
+
+export async function getStaticPaths() {
+	const notes = await notesRepository.listNotes();
+	return notes.map(({ slug }) => ({ params: { slug } }));
+}
+
+const note = await notesRepository.getNote(Astro.params.slug);
+if (!note) throw new Error(`Note not found: ${Astro.params.slug}`);
+const description = note.description ?? 'A short note by Stephan Kim.';
+---
+
+<BaseLayout title={`${note.title} — Stephan Kim`} {description}>
+	<article class="note-article">
+		<header>
+			<p class="eyebrow">Note</p>
+			<h1>{note.title}</h1>
+			<time datetime={note.publishedAt.toISOString()}>{formatDate(note.publishedAt)}</time>
+		</header>
+		<div class="prose" set:html={note.html} />
+		<footer class="article-footer">
+			<a href={`/notes/${note.year}/${note.month}/`}>← {note.year}. {note.month} 아카이브</a>
+		</footer>
+	</article>
+</BaseLayout>

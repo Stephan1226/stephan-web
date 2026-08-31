@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NoteList from '../components/NoteList.astro';
+import { notesRepository } from '../lib/notes';
+
+const notes = (await notesRepository.listNotes()).slice(0, 5);
+---
+
+<BaseLayout>
+	<section class="intro" aria-labelledby="site-title">
+		<p class="eyebrow">Personal publication · Seoul</p>
+		<h1 id="site-title">Stephan Kim</h1>
+		<p class="lede">Short notes, ideas and observations.</p>
+	</section>
+
+	<section class="recent-notes" aria-labelledby="recent-notes-title">
+		<div class="section-heading">
+			<h2 id="recent-notes-title">Recent notes</h2>
+			<a href="/notes/">All notes <span aria-hidden="true">→</span></a>
+		</div>
+		<NoteList {notes} />
+	</section>
+</BaseLayout>

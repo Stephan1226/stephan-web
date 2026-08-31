@@ -1,0 +1,52 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Stephan Kim — Short notes, ideas and observations.',
+	description = 'Short notes, ideas and observations by Stephan Kim.',
+} = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalUrl} />
+		<link rel="alternate" type="application/rss+xml" title="Stephan Kim Notes" href="/rss.xml" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Stephan Kim" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<div class="site-shell">
+			<header class="site-header">
+				<a class="wordmark" href="/" aria-label="Stephan Kim home">Stephan Kim</a>
+				<nav aria-label="Primary navigation">
+					<a href="/notes/">Notes</a>
+					<a href="/about/">About</a>
+				</nav>
+			</header>
+			<main><slot /></main>
+			<footer class="site-footer">
+				<p>© {new Date().getFullYear()} Stephan Kim</p>
+				<a href="/rss.xml">RSS</a>
+			</footer>
+		</div>
+	</body>
+</html>

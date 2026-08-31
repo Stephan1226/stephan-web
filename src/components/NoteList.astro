@@ -1,0 +1,48 @@
+---
+import { formatDate } from '../lib/date';
+import type { NoteSummary } from '../lib/notes';
+
+interface Props {
+	notes: NoteSummary[];
+	collapsedAfter?: number;
+}
+
+const { notes, collapsedAfter } = Astro.props;
+const collapsed = collapsedAfter !== undefined && notes.length > collapsedAfter;
+---
+
+<ol class="note-list">
+	{notes.map((note, index) => (
+		<li hidden={collapsed && index >= collapsedAfter}>
+			<a href={`/notes/${note.slug}/`} class="note-link">
+				<time datetime={note.publishedAt.toISOString()}>{formatDate(note.publishedAt)}</time>
+				<span>{note.title}</span>
+			</a>
+		</li>
+	))}
+</ol>
+{collapsed && (
+	<button type="button" class="show-more" data-show-more aria-expanded="false">
+		더보기 <span aria-hidden="true">→</span>
+	</button>
+)}
+{collapsed && (
+	<noscript>
+		<style is:inline>
+			.note-list li[hidden] { display: list-item; }
+			.show-more { display: none; }
+		</style>
+	</noscript>
+)}
+
+<script>
+	document.addEventListener('click', (event) => {
+		const button = (event.target as Element | null)?.closest('[data-show-more]');
+		if (!(button instanceof HTMLElement)) return;
+		const list = button.previousElementSibling;
+		if (!(list instanceof HTMLOListElement)) return;
+		for (const item of list.querySelectorAll('li[hidden]')) item.removeAttribute('hidden');
+		button.setAttribute('aria-expanded', 'true');
+		button.hidden = true;
+	});
+</script>

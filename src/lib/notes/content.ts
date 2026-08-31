@@ -1,4 +1,5 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import type { NotesRepository } from './repository';
 import type { ArchiveYear, Note, NoteSummary } from './types';
 
@@ -17,6 +18,7 @@ function toSummary(entry: CollectionEntry<'notes'>): NoteSummary {
 
 export class ContentNotesRepository implements NotesRepository {
 	#entries: Promise<CollectionEntry<'notes'>[]> | undefined;
+	#container: Promise<AstroContainer> | undefined;
 
 	#loadEntries() {
 		this.#entries ??= getCollection('notes', ({ data }) => !data.draft).then(
@@ -45,7 +47,13 @@ export class ContentNotesRepository implements NotesRepository {
 	async getNote(slug: string) {
 		const entry = (await this.#loadEntries()).find(({ id }) => id === slug);
 		if (!entry) return null;
-		const note: Note = { ...toSummary(entry), html: entry.rendered?.html ?? '' };
+		// Render through a container instead of using entry.rendered.html directly,
+		// so images in the Markdown are resolved and optimized rather than left as
+		// __ASTRO_IMAGE_ placeholders.
+		const { Content } = await render(entry);
+		this.#container ??= AstroContainer.create();
+		const html = await (await this.#container).renderToString(Content);
+		const note: Note = { ...toSummary(entry), html };
 		return note;
 	}
 

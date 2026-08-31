@@ -20,6 +20,17 @@ draft: false
 
 `draft: true`로 두면 로컬에서는 검증되지만 사이트와 RSS에는 노출되지 않습니다.
 
+### 이미지 넣기
+
+이미지 파일을 글과 같은 폴더(`src/content/notes/`)에 두고 상대 경로로 참조합니다:
+
+```md
+![이미지 설명](./2026-08-25-a-new-note-photo.jpg)
+```
+
+빌드 시 자동으로 webp로 변환·최적화되고, lazy loading과 크기 속성이 붙습니다.
+원본이 아무리 커도 배포본에는 최적화된 파일만 포함됩니다.
+
 ## Architecture
 
 Pages never read `astro:content` directly. All note data flows through the
